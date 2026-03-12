@@ -1,3 +1,5 @@
+# Career Dashboard / Progress Router
+# Triggered IDE re-parse for import fixes
 """
 Career Dashboard / Progress Router
 GET /progress/summary  — Aggregated analytics: readiness, quiz avg, interview avg
@@ -23,7 +25,7 @@ async def progress_summary(current_user: dict = Depends(get_current_user)):
     readiness_score = resume_res.data[0]["readiness_score"] if resume_res.data else 0
 
     quiz_scores = [q["score"] for q in quizzes_res.data if q.get("score") is not None]
-    avg_quiz = round(sum(quiz_scores) / len(quiz_scores), 1) if quiz_scores else 0
+    avg_quiz = float(f"{sum(quiz_scores) / len(quiz_scores):.1f}") if quiz_scores else 0.0
 
     interview_scores = []
     for session in interview_res.data:
@@ -31,9 +33,9 @@ async def progress_summary(current_user: dict = Depends(get_current_user)):
             evaluation = ans.get("evaluation", {})
             if "score" in evaluation:
                 interview_scores.append(evaluation["score"])
-    avg_interview = round(sum(interview_scores) / len(interview_scores), 1) if interview_scores else 0
+    avg_interview = float(f"{sum(interview_scores) / len(interview_scores):.1f}") if interview_scores else 0.0
 
-    overall_readiness = round((readiness_score * 0.4) + (avg_quiz * 0.3) + (avg_interview * 0.3), 1)
+    overall_readiness = float(f"{(float(readiness_score) * 0.4) + (avg_quiz * 0.3) + (avg_interview * 0.3):.1f}")
 
     return {
         "resume_readiness": readiness_score,

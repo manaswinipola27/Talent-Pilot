@@ -1,3 +1,5 @@
+# Quiz Engine Router
+# Triggered IDE re-parse for import fixes
 """
 Quiz Engine Router
 POST /quiz/generate  — Generate domain-specific quiz from skill gap
@@ -67,14 +69,14 @@ async def submit_quiz(body: SubmitRequest, current_user: dict = Depends(get_curr
 
     quiz = result.data[0]
     questions = quiz["questions"].get("questions", [])
-    correct = 0
+    correct_list = []
     review = []
     for q in questions:
         qid = str(q["id"])
         user_ans = body.responses.get(qid, "")
         is_correct = user_ans == q["answer"]
         if is_correct:
-            correct += 1
+            correct_list.append(1)
         review.append({
             "id": qid,
             "question": q["question"],
@@ -84,7 +86,8 @@ async def submit_quiz(body: SubmitRequest, current_user: dict = Depends(get_curr
             "explanation": q.get("explanation", ""),
         })
 
-    score = round((correct / len(questions)) * 100) if questions else 0
+    correct = len(correct_list)
+    score: int = round((float(correct) / len(questions)) * 100) if questions else 0
     sb.table("quizzes").update({
         "responses": body.responses,
         "score": score,

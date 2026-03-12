@@ -1,3 +1,5 @@
+# Resume Intelligence Router
+# Triggered IDE re-parse for import fixes
 """
 Resume Intelligence Router
 POST /resume/parse  — Upload and parse resume, extract skills & gaps
@@ -49,22 +51,25 @@ async def parse_resume(
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=415, detail="Only PDF and DOCX files are accepted.")
 
-    raw = await file.read()
-    if len(raw) > 5 * 1024 * 1024:   # 5 MB guard
+    raw_data = await file.read()
+    raw_bytes: bytes = raw_data if isinstance(raw_data, bytes) else bytes(raw_data)
+    if len(raw_bytes) > 5 * 1024 * 1024:   # 5 MB guard
         raise HTTPException(status_code=413, detail="File too large. Maximum size is 5 MB.")
 
     if file.content_type == "application/pdf":
-        resume_text = _extract_text_from_pdf(raw)
+        resume_text = _extract_text_from_pdf(raw_bytes)
     else:
-        resume_text = _extract_text_from_docx(raw)
+        resume_text = _extract_text_from_docx(raw_bytes)
 
     if not resume_text:
         raise HTTPException(status_code=422, detail="Could not extract text from the uploaded file.")
 
     from ai_wrapper import generate_ai_response
+    import itertools
+    truncated_resume = "".join(itertools.islice(resume_text, 8000))
     analysis = await generate_ai_response(
         system_prompt=SYSTEM_PROMPT, 
-        user_prompt=f"Resume text:\n\n{resume_text[:8000]}", 
+        user_prompt=f"Resume text:\n\n{truncated_resume}", 
         temperature=0.3
     )
 
