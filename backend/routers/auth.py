@@ -3,13 +3,18 @@ Auth Router — Register, Login, Profile
 """
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr
-from passlib.context import CryptContext
+import bcrypt
 
 from auth_utils import create_access_token
 from database import get_supabase
 
 router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(plain: str) -> str:
+    return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
 
 class RegisterRequest(BaseModel):
@@ -26,7 +31,7 @@ class LoginRequest(BaseModel):
 @router.post("/register", summary="Register a new user")
 async def register(body: RegisterRequest):
     sb = get_supabase()
-    hashed = pwd_context.hash(body.password)
+    hashed = hash_password(body.password)
     try:
         result = sb.table("users").insert({
             "name": body.name,
@@ -47,7 +52,7 @@ async def login(body: LoginRequest):
     if not result.data:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     user = result.data[0]
-    if not pwd_context.verify(body.password, user["password_hash"]):
+    if not verify_password(body.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_access_token({"sub": user["id"], "email": user["email"]})
     return {"access_token": token, "token_type": "bearer", "user": {"id": user["id"], "name": user["name"], "email": user["email"]}}

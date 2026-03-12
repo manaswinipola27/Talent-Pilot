@@ -61,29 +61,27 @@ async def parse_resume(
     if not resume_text:
         raise HTTPException(status_code=422, detail="Could not extract text from the uploaded file.")
 
-    # ── GPT-4 Analysis ───────────────────────────────────────
-    response = await ai.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"Resume text:\n\n{resume_text[:8000]}"},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.3,
+    from ai_wrapper import generate_ai_response
+    analysis = await generate_ai_response(
+        system_prompt=SYSTEM_PROMPT, 
+        user_prompt=f"Resume text:\n\n{resume_text[:8000]}", 
+        temperature=0.3
     )
-    import json
-    analysis = json.loads(response.choices[0].message.content)
 
     # ── Persist to Supabase ───────────────────────────────────
-    sb = get_supabase()
-    sb.table("resume_reports").upsert({
-        "user_id": current_user["user_id"],
-        "filename": file.filename,
-        "skills": analysis.get("skills", []),
-        "gaps": analysis.get("gaps", []),
-        "summary": analysis.get("summary", ""),
-        "readiness_score": analysis.get("readiness_score", 0),
-    }).execute()
+    try:
+        sb = get_supabase()
+        sb.table("resume_reports").insert({
+            "user_id": current_user["user_id"],
+            "filename": file.filename,
+            "skills": analysis.get("skills", []),
+            "gaps": analysis.get("gaps", []),
+            "summary": analysis.get("summary", ""),
+            "readiness_score": analysis.get("readiness_score", 0),
+        }).execute()
+    except Exception as db_err:
+        import logging
+        logging.getLogger(__name__).warning("DB save failed (non-fatal): %s", db_err)
 
     return {"status": "parsed", "analysis": analysis}
 

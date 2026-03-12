@@ -29,14 +29,10 @@ async def search_jobs(
     resume = sb.table("resume_reports").select("skills, gaps").eq("user_id", current_user["user_id"]).order("created_at", desc=True).limit(1).execute()
     skills = resume.data[0].get("skills", []) if resume.data else []
 
-    response = await ai.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": JOB_PROMPT},
-            {"role": "user", "content": f"Target role: {role}\nUser skills: {', '.join(skills)}"},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.6,
+    from ai_wrapper import generate_ai_response
+    jobs = await generate_ai_response(
+        system_prompt=JOB_PROMPT,
+        user_prompt=f"Target role: {role}\nUser skills: {', '.join(skills)}",
+        temperature=0.6
     )
-    jobs = json.loads(response.choices[0].message.content)
     return jobs

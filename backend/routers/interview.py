@@ -51,16 +51,12 @@ async def start_interview(body: StartRequest, current_user: dict = Depends(get_c
         level=body.level,
         mix_ratio=body.mix_ratio,
     )
-    response = await ai.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": "Generate the questions now."},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.7,
+    from ai_wrapper import generate_ai_response
+    questions = await generate_ai_response(
+        system_prompt=prompt,
+        user_prompt="Generate the questions now.",
+        temperature=0.7
     )
-    questions = json.loads(response.choices[0].message.content)
 
     sb = get_supabase()
     record = sb.table("interview_sessions").insert({
@@ -78,16 +74,12 @@ async def start_interview(body: StartRequest, current_user: dict = Depends(get_c
 
 @router.post("/evaluate", summary="Evaluate a candidate's interview answer")
 async def evaluate_answer(body: EvaluateRequest, current_user: dict = Depends(get_current_user)):
-    response = await ai.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": EVAL_PROMPT},
-            {"role": "user", "content": f"Question: {body.question}\n\nCandidate Answer: {body.answer}"},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.3,
+    from ai_wrapper import generate_ai_response
+    evaluation = await generate_ai_response(
+        system_prompt=EVAL_PROMPT,
+        user_prompt=f"Question: {body.question}\n\nCandidate Answer: {body.answer}",
+        temperature=0.3
     )
-    evaluation = json.loads(response.choices[0].message.content)
 
     # Append answer + evaluation to the session
     sb = get_supabase()

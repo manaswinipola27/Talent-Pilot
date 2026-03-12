@@ -64,6 +64,31 @@ async def health_check():
     return {"status": "ok", "service": "VidyāMitra API", "version": "1.0.0"}
 
 # ─────────────────────────────────────────────
+# Exception Handlers for Graceful Degradation
+# ─────────────────────────────────────────────
+from fastapi.responses import JSONResponse
+import httpx
+import openai
+
+@app.exception_handler(openai.APIError)
+async def openai_exception_handler(request, exc):
+    err_str = str(exc).lower()
+    if "insufficient_quota" in err_str or "429" in err_str:
+        return JSONResponse(
+            status_code=402,
+            content={"detail": "OpenAI API Quota Exceeded (429). Please top-up your OpenAI credits or update the API Key in the .env file to use AI features."}
+        )
+    return JSONResponse(status_code=400, content={"detail": f"OpenAI API Error: {str(exc)}"})
+
+@app.exception_handler(httpx.HTTPStatusError)
+async def httpx_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=400, 
+        content={"detail": f"External API request failed ({exc.response.status_code}). This typically happens if the API keys in your .env are empty (e.g. YouTube, NewsAPI)."}
+    )
+
+
+# ─────────────────────────────────────────────
 # Dev entry point
 # ─────────────────────────────────────────────
 if __name__ == "__main__":

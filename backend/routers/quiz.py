@@ -34,16 +34,12 @@ class SubmitRequest(BaseModel):
 
 @router.post("/generate", summary="Generate a quiz on a skill topic")
 async def generate_quiz(body: QuizRequest, current_user: dict = Depends(get_current_user)):
-    response = await ai.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": QUIZ_PROMPT.format(count=body.count, topic=body.topic)},
-            {"role": "user", "content": "Generate the quiz."},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.6,
+    from ai_wrapper import generate_ai_response
+    quiz_data = await generate_ai_response(
+        system_prompt=QUIZ_PROMPT.format(count=body.count, topic=body.topic),
+        user_prompt="Generate the quiz.",
+        temperature=0.6
     )
-    quiz_data = json.loads(response.choices[0].message.content)
 
     sb = get_supabase()
     record = sb.table("quizzes").insert({

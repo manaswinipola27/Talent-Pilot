@@ -47,16 +47,12 @@ async def generate_plan(body: PlanRequest, current_user: dict = Depends(get_curr
             raise HTTPException(status_code=404, detail="No resume gaps found. Upload your resume first.")
         gaps = result.data[0].get("gaps", [])
 
-    response = await ai.chat.completions.create(
-        model=settings.OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": PLANNER_PROMPT},
-            {"role": "user", "content": f"Target role: {body.target_role}\nSkill gaps: {', '.join(gaps)}"},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.5,
+    from ai_wrapper import generate_ai_response
+    plan = await generate_ai_response(
+        system_prompt=PLANNER_PROMPT, 
+        user_prompt=f"Target role: {body.target_role}\nSkill gaps: {', '.join(gaps)}", 
+        temperature=0.5
     )
-    plan = json.loads(response.choices[0].message.content)
 
     sb = get_supabase()
     sb.table("learning_plans").upsert({
