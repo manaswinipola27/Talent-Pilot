@@ -1,5 +1,5 @@
 """
-VidyāMitra — Intelligent Career Agent
+Talent Pilot — Intelligent Career Agent
 FastAPI Backend Entry Point
 """
 
@@ -14,7 +14,7 @@ from routers import resume, evaluate, plan, quiz, interview, jobs, progress, aut
 # App Initialisation
 # ─────────────────────────────────────────────
 app = FastAPI(
-    title="VidyāMitra — Intelligent Career Agent",
+    title="Talent Pilot — Intelligent Career Agent",
     description=(
         "An AI-powered platform bridging education and employability. "
         "Provides resume parsing, personalised upskilling plans, "
@@ -58,7 +58,7 @@ async def root():
 
 @app.get("/health", tags=["System"])
 async def health_check():
-    return {"status": "ok", "service": "VidyāMitra API", "version": "1.0.0"}
+    return {"status": "ok", "service": "Talent Pilot API", "version": "1.0.0"}
 
 # ─────────────────────────────────────────────
 # Exception Handlers for Graceful Degradation
