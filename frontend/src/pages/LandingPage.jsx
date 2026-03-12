@@ -17,7 +17,7 @@ export default function LandingPage() {
             <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem 2rem', borderBottom: '1px solid var(--clr-border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--grad-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-glow)' }}><Zap size={18} color="#fff" /></div>
-                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.1rem' }}>VidyāMitra</span>
+                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.1rem' }}>Talent Pilot</span>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <Link to="/login" className="btn btn-ghost">Sign In</Link>
@@ -34,7 +34,7 @@ export default function LandingPage() {
                     Bridge Education<br />& Employability
                 </h1>
                 <p style={{ fontSize: '1.2rem', maxWidth: 600, margin: '0 auto 2.5rem', color: 'var(--clr-muted)' }}>
-                    VidyāMitra is your intelligent career companion — parsing resumes, building personalised skill plans,
+                    Talent Pilot is your intelligent career companion — parsing resumes, building personalised skill plans,
                     simulating interviews, and tracking your readiness to the job market.
                 </p>
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -74,7 +74,7 @@ export default function LandingPage() {
             </section>
 
             <footer style={{ textAlign: 'center', padding: '2rem', color: 'var(--clr-muted)', fontSize: '0.85rem', borderTop: '1px solid var(--clr-border)' }}>
-                © {new Date().getFullYear()} VidyāMitra — Intelligent Career Agent. Built with ❤️ and GPT-4.
+                © {new Date().getFullYear()} Talent Pilot — Intelligent Career Agent. Built with ❤️ and GPT-4.
             </footer>
         </div>
     )

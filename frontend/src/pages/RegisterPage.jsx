@@ -18,7 +18,7 @@ export default function RegisterPage() {
         try {
             const { data } = await apiRegister(form)
             login(data.access_token, data.user)
-            toast.success(`Welcome to VidyāMitra, ${data.user.name}! 🎉`)
+            toast.success(`Welcome to Talent Pilot, ${data.user.name}! 🎉`)
             navigate('/dashboard')
         } catch (err) {
             toast.error(err.response?.data?.detail || 'Registration failed.')

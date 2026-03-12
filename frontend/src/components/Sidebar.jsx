@@ -39,7 +39,7 @@ export default function Sidebar() {
                     </div>
                     <div>
                         <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1rem', color: 'var(--clr-text)' }}>
-                            VidyāMitra
+                            Talent Pilot
                         </div>
                         <div style={{ fontSize: '0.7rem', color: 'var(--clr-muted)' }}>Career Agent</div>
                     </div>

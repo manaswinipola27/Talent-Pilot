@@ -34,7 +34,7 @@ export default function LoginPage() {
                         <Zap size={24} color="#fff" />
                     </div>
                     <h2 style={{ color: 'var(--clr-text)' }}>Welcome back</h2>
-                    <p style={{ marginTop: 4 }}>Sign in to your VidyāMitra account</p>
+                    <p style={{ marginTop: 4 }}>Sign in to your Talent Pilot account</p>
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
