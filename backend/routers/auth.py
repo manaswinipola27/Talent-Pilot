@@ -1,7 +1,7 @@
 """
 Auth Router — Register, Login, Profile
 """
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, EmailStr
 import bcrypt
 
@@ -59,7 +59,6 @@ async def login(body: LoginRequest):
 
 # --- Added specifically for Swagger UI `Authorize` Button Support ---
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Depends
 
 @router.post("/swagger_login", include_in_schema=False)
 async def swagger_login(form_data: OAuth2PasswordRequestForm = Depends()):
